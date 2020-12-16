@@ -15,6 +15,8 @@ import numpy as np
 import sys
 import pdb
 
+import dijkstra
+
 
 def read_from_cmd(connections_csv, t_csv):
     conns = pd.read_csv(connections_csv, delimiter=';')
@@ -69,7 +71,33 @@ def get_adjacency_from_file(conns_df):
     # remove zeros from adjacency dictionary
     adj_dict = remove_val_from_dict_of_lists(adj_dict, 0)
     return adj_dict
-    #TODO: maybe it should be a dictionary
+
+
+def populate_adj_conns_with_costs(adj_conns_dict):
+    """ Method to populate an adjacency connections dictionary with costs
+    for going from one to another.
+    TODO: I 'll populate them with 1. In the future it shoud change.
+    """
+    adj_conns_with_cost = {}
+    for key in adj_conns_dict.keys():
+        connections = adj_conns_dict[key]
+        adj_conns_with_cost[key] = []
+        for connection in connections:
+            adj_conns_with_cost[key].append({connection: 1})
+    return adj_conns_with_cost
+
+
+def get_edges(adj_conns, cost=1):
+    """ doc here
+    """
+    edges = []
+    for key in adj_conns.keys():
+        for v in adj_conns[key]:
+            edge = (key, v, cost)
+            edges.append(edge)
+    return edges
+            
+        
 
 
 def main():
@@ -77,6 +105,9 @@ def main():
     conns, t_matrix = read_from_cmd(sys.argv[1], sys.argv[2])
     # create adjacency list from csv file
     adj_conns = get_adjacency_from_file(conns)
+    adj_conns_with_cost = populate_adj_conns_with_costs(adj_conns)
+    edges = get_edges(adj_conns)
+    dijkstra_path = dijkstra.dijkstra(edges, 'EL43', 'EL51')
     pdb.set_trace()
     # run a dijkstra in the given adjacency list
     # create loads graph (csv file) according to the file with the loads (second file)
