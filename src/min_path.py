@@ -113,11 +113,11 @@ def main():
     adj_conns = get_adjacency_from_file(conns)
     adj_conns_with_cost = populate_adj_conns_with_costs(adj_conns)
     edges = get_edges(adj_conns)
+    # run a dijkstra in the given adjacency list
+    # create loads graph (csv file) according to the file with the loads
     dijkstra_path = dijkstra.dijkstra(edges, 'EL43', 'EL51')
     print(dijkstra_path)
     pdb.set_trace()
-    # run a dijkstra in the given adjacency list
-    # create loads graph (csv file) according to the file with the loads (second file)
     # plot results to map
     pass
 
