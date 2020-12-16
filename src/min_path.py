@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 import sys
 import pdb
+import csv
 
 import dijkstra
 
@@ -96,7 +97,12 @@ def get_edges(adj_conns, cost=1):
             edge = (key, v, cost)
             edges.append(edge)
     return edges
-            
+
+
+def write_to_file(filename, data_to_write):
+    with open(filename, 'w', newline='') as my_file:
+        wr = csv.writer(my_file, quoting=csv.QUOTE_ALL)
+        wr.writerow(data_to_write)
         
 
 
@@ -108,6 +114,7 @@ def main():
     adj_conns_with_cost = populate_adj_conns_with_costs(adj_conns)
     edges = get_edges(adj_conns)
     dijkstra_path = dijkstra.dijkstra(edges, 'EL43', 'EL51')
+    print(dijkstra_path)
     pdb.set_trace()
     # run a dijkstra in the given adjacency list
     # create loads graph (csv file) according to the file with the loads (second file)
