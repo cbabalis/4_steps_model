@@ -25,14 +25,14 @@ def is_input_valid(prod_cons_tn, movement, crit_percentage):
 def compute_4_step_model(prod_cons_tn, movement, crit_percentage, B_j, A_i=[], curr_matrix=[]):
     """ documentation here.
     """
+    cons = prod_cons_tn['Κατανάλωση'].tolist()
+    prods = prod_cons_tn['Παραγωγές (tn)'].tolist()
+    movs = movement.values.tolist()
     # if B_j == 1: then it is the first step. begin.
     if len(set(B_j)) == 1:
         curr_matrix = pd.DataFrame(np.ones((len(movement), len(movement))))
-        cons = prod_cons_tn['Κατανάλωση'].tolist()
-        pdb.set_trace()
-        A_i = compute_coefficient(cons, movement.values.tolist(), B_j)
-        pdb.set_trace()
-        #compute_T_i_j(A_i, prod_cons_tn[], B_j, prod_cons_tn['Κατανάλωση'], movement)
+        A_i = compute_coefficient(cons, movs, B_j)
+        T = compute_T_i_j(A_i, prods, B_j, cons, movs)
     pdb.set_trace()
     # if crit_percentage is satsified, then exit
     # call again compute_4_step_model with different B_j, A_j, curr_matrix
@@ -42,7 +42,6 @@ def compute_coefficient(tn, movement, existing_coef):
     coef = []
     for mv_line in movement:
         coef.append(sumprod(tn, mv_line, existing_coef))
-    pdb.set_trace()
     coef = [1/x for x in coef]
     return coef
 
@@ -53,6 +52,18 @@ def sumprod(li1, li2, l3):
     for l1, l2, l3 in zip(li1, li2, l3):
         sumproduct += l1 * l2 * l3
     return sumproduct
+
+
+def compute_T_i_j(A_i, prods, B_j, cons, movement):
+    i_rows = []
+    for ai, prod_i, mov_i in zip(A_i, prods, movement):
+        j_rows = []
+        for bj, con_i, m in zip(B_j, cons, mov_i):
+            t = bj * con_i * m * ai * prod_i
+            j_rows.append(t)
+        i_rows.append(j_rows)
+    pdb.set_trace()
+    return i_rows
 
 
 def compute_threshold(df):
