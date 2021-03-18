@@ -9,6 +9,7 @@ import pdb
 
 is_A_turn = True
 
+
 def read_user_input(prod_cons_tn_fpath, movement_fpath, crit):
     prod_cons_tn = pd.read_csv(prod_cons_tn_fpath, delimiter='\t')
     movement = pd.read_csv(movement_fpath, delimiter='\t')
@@ -35,20 +36,19 @@ def compute_4_step_model(prod_cons_tn, movement, crit_percentage, B_j, A_i=[]):
         A_i = compute_coefficient(cons, movs, B_j)
         is_A_turn = False
         T = compute_T_i_j(A_i, prods, B_j, cons, movs)
-
-    pdb.set_trace()
     # if crit_percentage is satsified, then exit else
     # call again compute_4_step_model with different B_j, A_j, curr_matrix
-    if is_threshold_satisfied(T, crit_percentage):
+    if is_threshold_satisfied(T, crit_percentage, prods, cons, is_A_turn):
+        pdb.set_trace()
         return T
     elif is_A_turn:
         A_i = compute_coefficient(cons, movs, B_j)
         is_A_turn = False
-        T = compute_T_i_j(A_i, prods, B_j, cons, movs)
+        return compute_T_i_j(A_i, prods, B_j, cons, movs)
     else:
         B_j = compute_coefficient(prods, movs, A_i)
         is_A_turn = True
-        T = compute_T_i_j(A_i, prods, B_j, cons, movs)
+        return compute_T_i_j(A_i, prods, B_j, cons, movs)
 
 
 def compute_coefficient(tn, movement, existing_coef):
@@ -78,23 +78,32 @@ def compute_T_i_j(A_i, prods, B_j, cons, movement):
     return i_rows
 
 
-def is_threshold_satisfied(T, tn, threshold, is_A_turn):
-    """ doc here """
+def is_threshold_satisfied(T, threshold, prods, cons, is_A_turn):
+    # compute all sums
     df = pd.DataFrame(T)
-    if is_A_turn:
+    if not is_A_turn:
         # compute cols sums
         sums = df.sum(axis=0)
+        thres = compute_percentages(sums, cons, threshold, is_A_turn)
     else:
         # compute rows sums
         sums = df.sum(axis=1)
-        pass
-    thres = pd.DataFrame([sums, tn])
+        thres = compute_percentages(sums, prods, threshold, is_A_turn)
+    pdb.set_trace()
+    satisfied_thresholds = len(thres[thres['res'] < threshold])
+    if satisfied_thresholds < len(thres):
+        return False
+    else:
+        return True
+    
+
+
+def compute_percentages(sums, tn, threshold, is_A_turn):
+    """ doc here """
+    thres = pd.DataFrame([sums.tolist(), tn])
     thres = thres.T
     compute_threshold(thres)
-    if len(thres[thres['res'] < threshold]) < len(thres):
-        return False
-    return True
-    
+    return thres
 
 
 def compute_threshold(df):
@@ -116,7 +125,8 @@ def main():
     assert is_input_valid(prod_cons_tn, movement, crit_percentage)
     # do some preliminary work
     B_j = [1 for i in range(0, len(prod_cons_tn))]
-    compute_4_step_model(prod_cons_tn, movement, crit_percentage, B_j)
+    T = compute_4_step_model(prod_cons_tn, movement, crit_percentage, B_j)
+    pdb.set_trace()
     # run main algorithm
 
 
