@@ -50,7 +50,6 @@ def compute_4_step_model(prod_cons_tn, movement, crit_percentage, B_j, A_i=[]):
             is_A_turn = True
             T =  compute_T_i_j(A_i, prods, B_j, cons, movs)
         iterations += 1
-    pdb.set_trace()
     return T
 
 
@@ -92,7 +91,6 @@ def is_threshold_satisfied(T, threshold, prods, cons, is_A_turn):
         # compute rows sums
         sums = df.sum(axis=1)
         thres = compute_percentages(sums, prods, threshold, is_A_turn)
-        pdb.set_trace()
     satisfied_thresholds = len(thres[thres['res'] < threshold])
     if satisfied_thresholds < len(thres):
         return False
@@ -119,6 +117,19 @@ def test_print(a_word):
     print(a_word)
 
 
+def write_matrix_to_file(T, fpath):
+    df = pd.DataFrame(T)
+    df = df.applymap(downgrade_to_two_dec)
+    df.to_csv(fpath)
+
+
+def downgrade_to_two_dec(x):
+    try:
+        return '{0:.2f}'.format(x)
+    except:
+        return x
+
+
 def main():
     # read input arrays
     prod_cons_fp, mv_fp, pcnt = sys.argv[1], sys.argv[2], sys.argv[3]
@@ -129,7 +140,8 @@ def main():
     # do some preliminary work
     B_j = [1 for i in range(0, len(prod_cons_tn))]
     T = compute_4_step_model(prod_cons_tn, movement, crit_percentage, B_j)
-    pdb.set_trace()
+    print("iterations are ", iterations)
+    write_matrix_to_file(T, 'output.csv')
     # run main algorithm
 
 
