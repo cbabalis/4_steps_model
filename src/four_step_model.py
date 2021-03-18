@@ -8,6 +8,7 @@ import pdb
 
 
 is_A_turn = True
+iterations = 1
 
 
 def read_user_input(prod_cons_tn_fpath, movement_fpath, crit):
@@ -28,6 +29,7 @@ def is_input_valid(prod_cons_tn, movement, crit_percentage):
 def compute_4_step_model(prod_cons_tn, movement, crit_percentage, B_j, A_i=[]):
     """ documentation here.
     """
+    global iterations
     # if B_j == 1: then it is the first step. begin.
     if len(set(B_j)) == 1:
         cons = prod_cons_tn['Κατανάλωση'].tolist()
@@ -38,17 +40,18 @@ def compute_4_step_model(prod_cons_tn, movement, crit_percentage, B_j, A_i=[]):
         T = compute_T_i_j(A_i, prods, B_j, cons, movs)
     # if crit_percentage is satsified, then exit else
     # call again compute_4_step_model with different B_j, A_j, curr_matrix
-    if is_threshold_satisfied(T, crit_percentage, prods, cons, is_A_turn):
-        pdb.set_trace()
-        return T
-    elif is_A_turn:
-        A_i = compute_coefficient(cons, movs, B_j)
-        is_A_turn = False
-        return compute_T_i_j(A_i, prods, B_j, cons, movs)
-    else:
-        B_j = compute_coefficient(prods, movs, A_i)
-        is_A_turn = True
-        return compute_T_i_j(A_i, prods, B_j, cons, movs)
+    while not is_threshold_satisfied(T, crit_percentage, prods, cons, is_A_turn):
+        if is_A_turn:
+            A_i = compute_coefficient(cons, movs, B_j)
+            is_A_turn = False
+            T = compute_T_i_j(A_i, prods, B_j, cons, movs)
+        else:
+            B_j = compute_coefficient(prods, movs, A_i)
+            is_A_turn = True
+            T =  compute_T_i_j(A_i, prods, B_j, cons, movs)
+        iterations += 1
+    pdb.set_trace()
+    return T
 
 
 def compute_coefficient(tn, movement, existing_coef):
@@ -89,7 +92,7 @@ def is_threshold_satisfied(T, threshold, prods, cons, is_A_turn):
         # compute rows sums
         sums = df.sum(axis=1)
         thres = compute_percentages(sums, prods, threshold, is_A_turn)
-    pdb.set_trace()
+        pdb.set_trace()
     satisfied_thresholds = len(thres[thres['res'] < threshold])
     if satisfied_thresholds < len(thres):
         return False
