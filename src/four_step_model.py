@@ -108,7 +108,7 @@ def compute_percentages(sums, tn, threshold, is_A_turn):
 
 
 def compute_threshold(df):
-    """TODO: need to implement the following line"""
+    """this creates a new column with percentages."""
     df['res'] = (df[1] - df[0]) / df[1] * 100
     df['res'] = abs(df['res'])
 
