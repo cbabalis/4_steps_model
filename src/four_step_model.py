@@ -41,6 +41,7 @@ def compute_4_step_model(prod_cons_tn, movement, crit_percentage, B_j, A_i=[]):
     # if crit_percentage is satsified, then exit else
     # call again compute_4_step_model with different B_j, A_j, curr_matrix
     while not is_threshold_satisfied(T, crit_percentage, prods, cons, is_A_turn):
+    #while iterations < 6:
         if is_A_turn:
             A_i = compute_coefficient(cons, movs, B_j)
             is_A_turn = False
@@ -111,6 +112,10 @@ def compute_threshold(df):
     """this creates a new column with percentages."""
     df['res'] = (df[1] - df[0]) / df[1] * 100
     df['res'] = abs(df['res'])
+    # code to check if df[1], df[0] is empty somewhere
+    if df['res'].isnull().values.any():
+        print("empty values are ", df['res'].isnull().sum())
+        df['res'] = df['res'].fillna(0)
 
 
 def test_print(a_word):
