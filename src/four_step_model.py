@@ -135,10 +135,20 @@ def downgrade_to_two_dec(x):
         return x
 
 
+def read_user_input_xls(prod_cons_tn_fpath, movement_fpath, crit, sheet='for_BABIS'):
+    xls = pd.ExcelFile(prod_cons_tn_fpath) #pd.read_csv(prod_cons_tn_fpath, delimiter='\t')
+    prod_cons_tn = pd.read_excel(xls, sheet)
+    movement = pd.read_csv(movement_fpath, delimiter='\t')
+    crit_percentage = float(crit)
+    return prod_cons_tn, movement, crit_percentage
+
+
+
 def main():
     # read input arrays
     prod_cons_fp, mv_fp, pcnt = sys.argv[1], sys.argv[2], sys.argv[3]
-    prod_cons_tn, movement, crit_percentage = read_user_input(prod_cons_fp, mv_fp, pcnt)
+    #prod_cons_tn, movement, crit_percentage = read_user_input(prod_cons_fp, mv_fp, pcnt)
+    prod_cons_tn, movement, crit_percentage = read_user_input_xls(prod_cons_fp, mv_fp, pcnt)
     test_print([prod_cons_tn, movement, crit_percentage])
     # check if arrays are ok (same length)
     assert is_input_valid(prod_cons_tn, movement, crit_percentage)
